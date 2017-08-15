@@ -5,7 +5,7 @@ from django.db import models
 
 
 class MacroBody(models.Model):
-    macroDesc = models.CharField(max_length=20, blank=False)
+    macroDesc = models.CharField(max_length=20, blank=False, unique=True)
 
     class Meta:
         verbose_name = 'Macro Body Part'
@@ -16,8 +16,8 @@ class MacroBody(models.Model):
 
 
 class MicroBody(models.Model):
-    majorBody = models.ForeignKey(MacroBody)
-    microDesc = models.CharField(max_length=50, blank=False)
+    macroBody = models.ForeignKey(MacroBody, blank=False)
+    microDesc = models.CharField(max_length=50, blank=False, unique=True)
 
     class Meta:
         verbose_name = 'Micro Body Part'
@@ -28,8 +28,8 @@ class MicroBody(models.Model):
 
 
 class ExerciseName(models.Model):
-    exerciseName = models.CharField(max_length=50)
-
+    exerciseName = models.CharField(max_length=50, unique=True)
+    isApproved = models.BooleanField(default=False)
     class Meta:
         verbose_name = 'Exercise/Movement'
         verbose_name_plural = 'Exercises/Movements'
@@ -39,13 +39,25 @@ class ExerciseName(models.Model):
 
 
 class ExerciseMuscleGroups(models.Model):
-    exerciseName = models.ForeignKey(ExerciseName)
-    targetMicro = models.ForeignKey(MicroBody, blank=True)
-    targetMacro = models.ForeignKey(MacroBody, blank=False)
+    exerciseName = models.ForeignKey(ExerciseName, blank=False)
+    targetMicro = models.ForeignKey(MicroBody, blank=True, unique=True)
+    targetMacro = models.ForeignKey(MacroBody, blank=False, unique=True)
 
     class Meta:
         verbose_name = 'Exercise Target Muscle'
         verbose_name_plural = 'Exercise Target Muscles'
+
+    def __unicode__(self):
+        return self.exerciseName
+
+
+class ExerciseTips(models.Model):
+    exerciseName = models.ForeignKey(ExerciseName, blank=False)
+    exerciseTip = models.CharField(max_length=200, unique=True)
+
+    class Meta:
+        verbose_name = 'Exercise Tip'
+        verbose_name_plural = 'Exercise Tips'
 
     def __unicode__(self):
         return self.exerciseName
