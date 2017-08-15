@@ -2,5 +2,11 @@
 from __future__ import unicode_literals
 
 from django.contrib import admin
-
+from models import *
 # Register your models here.
+
+admin.site.register(MacroBody)
+admin.site.register(MicroBody)
+admin.site.register(ExerciseName)
+admin.site.register(ExerciseMuscleGroups)
+admin.site.register(ExerciseTips)

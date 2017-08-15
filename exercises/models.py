@@ -14,6 +14,11 @@ class MacroBody(models.Model):
     def __unicode__(self):
         return self.macroDesc
 
+    def as_json(self):
+        return dict(
+            macroDesc=self.macroDesc
+        )
+
 
 class MicroBody(models.Model):
     macroBody = models.ForeignKey(MacroBody, blank=False)
@@ -26,10 +31,17 @@ class MicroBody(models.Model):
     def __unicode__(self):
         return self.microDesc
 
+    def as_json(self):
+        return dict(
+            macroBody=self.macroBody.macroDesc,
+            microDesc=self.microDesc
+        )
+
 
 class ExerciseName(models.Model):
     exerciseName = models.CharField(max_length=50, unique=True)
     isApproved = models.BooleanField(default=False)
+
     class Meta:
         verbose_name = 'Exercise/Movement'
         verbose_name_plural = 'Exercises/Movements'
@@ -37,18 +49,30 @@ class ExerciseName(models.Model):
     def __unicode__(self):
         return self.exerciseName
 
+    def as_json(self):
+        return dict(
+            exerciseName=self.exerciseName
+        )
+
 
 class ExerciseMuscleGroups(models.Model):
     exerciseName = models.ForeignKey(ExerciseName, blank=False)
-    targetMicro = models.ForeignKey(MicroBody, blank=True, unique=True)
-    targetMacro = models.ForeignKey(MacroBody, blank=False, unique=True)
+    targetMicro = models.ForeignKey(MicroBody, blank=True)
+    targetMacro = models.ForeignKey(MacroBody, blank=False)
 
     class Meta:
         verbose_name = 'Exercise Target Muscle'
         verbose_name_plural = 'Exercise Target Muscles'
 
     def __unicode__(self):
-        return self.exerciseName
+        return self.exerciseName.exerciseName
+
+    def as_json(self):
+        return dict(
+            exerciseName=self.exerciseName.exerciseName,
+            targetMicro=self.targetMicro.microDesc,
+            targetMacro=self.targetMacro.macroDesc
+        )
 
 
 class ExerciseTips(models.Model):
@@ -60,4 +84,10 @@ class ExerciseTips(models.Model):
         verbose_name_plural = 'Exercise Tips'
 
     def __unicode__(self):
-        return self.exerciseName
+        return self.exerciseName.exerciseName
+
+    def as_json(self):
+        return dict(
+            exerciseName=self.exerciseName.exerciseName,
+            exerciseTip=self.exerciseTip
+        )
