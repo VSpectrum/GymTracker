@@ -16,6 +16,9 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 
+import exercises.views as ex_view
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^exercise_manager/$', ex_view.exercise_handler),
 ]
