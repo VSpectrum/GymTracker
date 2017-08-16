@@ -19,11 +19,27 @@ class UserExercises(models.Model):
 
 class UserExercisesSetReps(models.Model):
     userExercise = models.ForeignKey(UserExercises)
-    reps = models.SmallIntegerField(blank=False)
+    sets = models.SmallIntegerField()
 
     class Meta:
         verbose_name = 'User\'s Exercise Reps'
         verbose_name_plural = 'User\'s Exercises Reps'
 
     def __unicode__(self):
+        return str(self.sets)
+
+
+class UserExerciseTemplate(models.Model):
+    user = models.ForeignKey(User)
+    isFixedReps = models.BooleanField(default=True)  # if this is false then it implies Weight is fixed but reps change
+
+    class Meta:
+        verbose_name = 'User\'s Template'
+        verbose_name_plural = 'User\'s Templates'
+
+    def __unicode__(self):
         return str(self.reps)
+
+
+class FrequencyHandler(models.Model):  # how to handle which exercises are assigned to what day/session
+    pass
