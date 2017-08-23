@@ -13,12 +13,22 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url
+from django.conf.urls import url, include
 from django.contrib import admin
 
 import exercises.views as ex_view
+import usertrack.views as user_views
+
+admin.site.index_title = 'Gym Planner Administration'
+admin.site.site_header = 'Gym Planner Administration'
+admin.site.site_title = 'Gym Planner Admin'
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url('', include('social_django.urls', namespace='social')),
+
     url(r'^exercise_manager/$', ex_view.exercise_handler),
+
+    url(r'^user_manager/$', user_views.user_handling),
+    url(r'^$', user_views.homepage),
 ]
