@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+{% if user.is_authenticated %}
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<meta name="description" content="">
+		<meta name="author" content="">
+		<link rel="icon" href="">
+		<title>Gym Planner - {{ user.username }}</title>
+
+		<link href="{% static 'css/bootstrap.css'%}" rel="stylesheet">
+		<link href="{% static 'css/bootstrap-social.css'%}" rel="stylesheet">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+
+		<link rel="stylesheet" type="text/css" href="{% static 'css/component.css'%}" >
+		<link rel="stylesheet" type="text/css" href="{% static 'datatable/datatables.min.css'%}" >
+
+
+
+        <link href="{% static 'toast/ax5toast.css' %}" rel="stylesheet">
+        <link href="{% static 'contextMenu/jquery.contextMenu.min.css' %}" rel="stylesheet">
+        <link href="{% static 'css/dropdown.min.css'%}" rel="stylesheet">
+        <link href="{% static 'css/transition.min.css'%}" rel="stylesheet">
+
+		<link href="{% static 'css/homestyle.css'%}" rel="stylesheet">
+
+        <script>
+            var username = "{{ user.username }}";
+            var csrftoken = '{{ csrf_token }}';
+        </script>
+
+	</head>
+	<body id="page-top">
+
+		<div class="modal fade" id="sessionEntry" tabindex="-1" role="dialog" aria-labelledby="Modal-label-1">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="md-content">
+						<h3>Session Data Entry</h3>
+						<div>
+							<form id="requestForm" class="send-money-form" action="/request" method="POST">
+								<div class="col-sm-12">
+
+									<div class="strike">
+										<span>
+											Pay Via
+										</span>
+									</div>
+
+                                    <ul class="nav nav-tabs">
+                                      <li class="active cardtab"><a data-toggle="tab" data-target="#card">Credit Card</a></li>
+                                      <li class="cashtab"><a data-toggle="tab" data-target="#cash">Cash</a></li>
+                                    </ul>
+
+                                    <div class="tab-content">
+                                        <div class="tab-pane active" id="card">
+
+                                        </div>
+                                        <div class="tab-pane col-md-6" id="cash">
+                                            <div class="row">
+                                                <div class="col-sm-12 form-group">
+                                                	<div class="col-md-4" style="padding-left: 0px;">
+                                                        <label>Amount</label>
+                                                        <input type="number" name="pickup_amount" placeholder="Enter Amount Here" class="form-control">
+                                                    </div>
+                                                    <div class="col-md-4" style="padding-left: 0px;">
+                                                    </div>
+                                                    <div class="col-md-4" style="padding-left: 0px;padding-right: 0px;">
+                                                        <label>Your Phone #</label>
+                                                        <input type="number" name="phone_number" placeholder="e.g. 1868XXXXXXX" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-sm-12 form-group">
+                                                	<div class="col-md-12" style="padding-left: 0px; padding-right: 0px;">
+                                                        <label>Your Email - Confirmation code for Payout Partner</label>
+                                                        <input type="email" name="pickup_email" placeholder="something@gmail.com" title="Confirmation code used by Payout Partner sent to this email address for transaction validation" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        {% csrf_token %}
+
+                                        <div class="col-sm-12 requestdetails">
+                                            <div class="row">
+                                                <div class="col-sm-12 form-group">
+                                                	<div class="col-md-4" style="padding-left: 0px;">
+                                                        <label>Amount</label>
+                                                        <input type="number" name="amount" placeholder="Enter Amount Here" class="form-control">
+                                                    </div>
+                                                    <div class="col-md-4" style="padding-left: 0px;">
+                                                    </div>
+                                                    <div class="col-md-4" style="padding-left: 0px;padding-right: 0px;">
+                                                        <label>Recipient Phone #</label>
+                                                        <input type="number" name="recip_phone_number" placeholder="e.g. 1868XXXXXXX" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-sm-12 form-group">
+                                                	<div class="col-md-12" style="padding-left: 0px; padding-right: 0px;">
+                                                        <label>Recipient Email</label>
+                                                        <input type="email" name="recip_email" title="Confirmation code used by Payout Partner sent to this email address for transaction validation" placeholder="something@gmail.com" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+	                                            <div class="col-md-6">
+	                                                <div id="requestCaptcha" class="g-recaptcha" data-size="normal" data-sitekey="6Lc39iITAAAAAM50LppiWEpdmwHqsHgxk0o4-Lzq"></div>
+	                                            </div>
+	                                            <div class="col-md-6">
+	                                                <button id="submitRequest" type="button" class="btn btn-lg btn-info pull-right validate-btn">Request</button>
+	                                                <button type="button" class="md-close btn btn-close pull-right close-register-btn" data-dismiss="modal">Close</button>
+	                                            </div>
+	                                        </div>
+                                        </div>
+                                    </div>
+
+
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+        <div class="modal fade" id="createSession" tabindex="-1" role="dialog" aria-labelledby="Modal-label-2">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="md-content">
+						<h3>Create Session Template</h3>
+						<div>
+							<form id="requestForm" class="send-money-form" action="/request" method="POST">
+								<div class="col-sm-12">
+
+									<div class="strike">
+										<span>
+											Session's Name
+										</span>
+									</div>
+
+                                    <input type="text" name="sessionName" placeholder="e.g. Biceps/Chest" class="form-control">
+
+                                    <div class="strike">
+										<span>
+											Exercises performed in Session
+										</span>
+									</div>
+
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <label for="exercise_list">How would you handle being unable to complete a set?</label>
+                                                <label class="radio-block" style="font-weight: 500;">
+                                                    <input type="radio" name="optradio" value="fixedReps"> Decrease the weight and complete the following sets
+                                                </label>
+                                                <label class="radio-block" style="font-weight: 500;">
+                                                    <input type="radio" name="optradio" value="fixedWeight"> Lessen / Not perform remaining reps
+                                                </label>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-offset-1 col-md-10">
+                                            <div class="strike">
+                                                <span></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label for="body_parts">Filter by Body Parts</label>
+                                            <select class="ui dropdown" id="body_parts">
+                                                <option>ALL</option>
+                                                <option>2</option>
+                                                <option>3</option>
+                                                <option>4</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label for="body_muscle">Filter by Muscle</label>
+                                            <select class="ui dropdown" id="body_muscle">
+                                                <option>ALL</option>
+                                                <option>2</option>
+                                                <option>3</option>
+                                                <option>4</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-offset-1 col-md-10">
+                                            <div class="strike">
+                                                <span></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-8">
+                                            <label for="exercise_list">Exercise / Movement</label>
+                                            <select class="ui search dropdown fill-width" id="exercise_list">
+                                                <option>test1</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-4" style="margin-top: 30px">
+                                            <button class="btn">ADD</button>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="strike">
+                                        <span>List of Added Exercises for Session</span>
+                                    </div>
+
+
+
+
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+
+		<!-- Navigation -->
+		<div id="wrapper">
+			<nav class="navbar navbar-default">
+				<div class="container">
+					<!-- Brand and toggle get grouped for better mobile display -->
+					<div class="navbar-header page-scroll">
+						<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						</button>
+{#						<a class="navbar-brand page-scroll" href="/"><img src="{% static 'images/Xeemit.png'%}" alt="Xeemit logo"></a>#}
+					</div>
+					<!-- Collect the nav links, forms, and other content for toggling -->
+					<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1" style="margin-right:-15px;margin-left:-25px;">
+						<ul class="nav navbar-nav navbar-right">
+							<li class="hidden">
+								<a href="#page-top"></a>
+							</li>
+
+
+							<li class="myAccount-btn" style="opacity:0;">
+								<a href="#myaccount">My Account</a>
+
+							</li>
+
+							<li>
+								<a href="#logout">Sign Out</a>
+							</li>
+						</ul>
+						<ul class="nav navbar-nav">
+							<li>
+								<a href="#userreport">User Report</a>
+							</li>
+							<li>
+								<a href="#gymplaneditor">Gym Plan</a>
+							</li>
+
+                            {% if isPayoutPartner %}
+							<li>
+								<a href="#requests">Open Requests</a>
+							</li>
+                            <li>
+                                <a href="#pickups">Cash Pickups</a>
+                            </li>
+                            {% endif %}
+
+						</ul>
+					</div>
+					<!-- /.navbar-collapse -->
+				</div>
+				<!-- /.container-fluid -->
+			</nav>
+
+			<section id="userreport" class="mz-module">
+				<div class="container">
+
+					<div class="row">
+						<div class="information">
+							<div class="col-md-6">
+								<h1>Progress Tracking</h1>
+							</div>
+						</div>
+
+						<div class="col-md-6">
+							
+							<div class="button-wrapper">
+								<button class="input-session-data ninja-button icon-alone">
+									<span aria-hidden="true"></span>
+									<span>Session Data Entry +</span>
+								</button>
+							</div>
+
+
+							<div style="padding:5px;float:right;"></div>
+
+						</div>
+					</div>
+
+				</div><!-- container -->
+			</section>
+			
+
+            <section id="gymplaneditor" class="mz-module">
+				<div class="container">
+
+					<div class="row">
+						<div class="information">
+							<div class="col-md-6">
+								<h1>Gym Plan Editor</h1>
+							</div>
+						</div>
+
+						<div class="col-md-6">
+
+							<div class="button-wrapper">
+								<button class="input-session-data ninja-button icon-alone">
+									<span aria-hidden="true"></span>
+									<span>Session Data Entry +</span>
+								</button>
+							</div>
+
+                            <div style="padding:5px;float:right;"></div>
+
+
+                            <div class="button-wrapper">
+								<button class="create-session ninja-button icon-alone">
+									<span aria-hidden="true"></span>
+									<span>Create New Session +</span>
+								</button>
+							</div>
+
+
+							<div style="padding:5px;float:right;"></div>
+						</div>
+					</div>
+
+
+
+				</div><!-- container -->
+			</section>
+			<p id="back-top">
+				<a href="#top"><i class="fa fa-angle-up"></i></a>
+			</p>
+
+			<div class="push"></div>
+		</div>
+
+
+		<!-- Bootstrap core JavaScript
+			================================================== -->
+		<!-- Placed at the end of the document so the pages load faster -->
+		<script src="{% static 'js/jquery-2.2.4.min.js'%}"></script>
+		<script src="{% static 'js/bootstrap.min.js'%}"></script>
+		<script src="{% static 'toast/ax5core.min.js'%}"></script>
+		<script src="{% static 'toast/ax5toast.min.js'%}"></script>
+
+		<script src="{% static 'js/modernizr.custom.js'%}"></script>
+		<script src="{% static 'js/SmoothScroll.js'%}"></script>
+		<script src="{% static 'js/theme-scripts.js'%}"></script>
+		<script src="{% static 'js/classie.js'%}"></script>
+		<script src="{% static 'js/modalEffects.js'%}"></script>
+		<script src="{% static 'datatable/datatables.js'%}"></script>
+		<script src="{% static 'datatable/init.js'%}"></script>
+        <script src="{% static 'tel/js/intlTelInput.js' %}"></script>
+
+
+		<script src="{% static 'contextMenu/jquery.ui.position.js'%}"></script>
+		<script src="{% static 'contextMenu/jquery.contextMenu.js'%}"></script>
+        <script src="{% static 'js/dropdown.min.js' %}"></script>
+        <script src="{% static 'js/transition.min.js' %}"></script>
+
+{##}
+{#        <script>#}
+{#            var capt_code;#}
+{#            var capt_req;#}
+{#            var capt_reg;#}
+{##}
+{#            var CaptchaCallback = function() {#}
+{#                capt_code = grecaptcha.render('validationCodeCaptcha', {'sitekey' : '6Lc39iITAAAAAM50LppiWEpdmwHqsHgxk0o4-Lzq'});#}
+{#                capt_reg = grecaptcha.render('registrationCaptcha', {'sitekey' : '6Lc39iITAAAAAM50LppiWEpdmwHqsHgxk0o4-Lzq'});#}
+{#                capt_req = grecaptcha.render('requestCaptcha', {'sitekey' : '6Lc39iITAAAAAM50LppiWEpdmwHqsHgxk0o4-Lzq'});#}
+{#            };#}
+{#        </script>#}
+{#        <script src="https://www.google.com/recaptcha/api.js?onload=CaptchaCallback&render=explicit" async defer></script>#}
+
+
+        <!-- -------------------------------------------------------------------------------- -->
+
+		<script src="{% static 'js/router.js'%}"></script>
+		<script src="{% static 'js/main.js'%}"></script>
+
+
+		<script>
+			console.log(location.href);
+			{% if isPayoutPartner %} {# controls home page redirection for user depending on whether they are payout partner or not #}
+				if (location.href.indexOf('#')<1 || location.href.slice(-1) == '#') location.href="#managerreport";
+			{% else %}
+				if (location.href.indexOf('#')<1 || location.href.slice(-1) == '#') location.href="#userreport";
+                $("#telephone").intlTelInput();
+
+
+                $('a[href="#deliveries"]').click(function(){
+                    $('#PayoutPartnerRegistrationForm').modal('show');
+                });
+			{% endif %}
+
+            $('.ui.dropdown').dropdown();
+		</script>
+
+        <script>
+            $('#submitRequest').click(function(){
+                if(grecaptcha.getResponse(capt_req) != "") {
+                    var datastring = $("#requestForm").serializeArray();
+                    datastring.push({name:"ADD", value:"ADD"});
+                    datastring.push({name:"currency", value:$('div[name="currency"]').val()});
+                    if ($('input[name="pickup_amount]').val()) datastring.push({name:"pickup_currency", value:$('div[name="pickup_currency"]').val()});
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/request",
+                        data: $.param(datastring),
+                        dataType: "text",
+                        success: function (data) {
+                            $('#sessionEntry').modal('hide');
+                            $('.modal-backdrop').remove();
+                            var newRow = data;
+                            $('.your-requests-table').DataTable().row.add($(newRow)).draw();
+                            $('#requestForm').find('.form-control').val('');
+                            grecaptcha.reset();
+                            successToast.push('Request successfully submitted.');
+                        },
+                        error: function (data) {
+                            console.log('Error');
+                            console.log(data);
+                        }
+                    });
+                }
+                else {
+                    console.log('Captcha not solved.');
+                }
+            });
+
+            $('#submitCode').click(function(){
+                if(grecaptcha.getResponse(capt_code) != "") {
+                    var datastring = $("#delivery_Form").serializeArray();
+                    $.ajax({
+                        type: "POST",
+                        url: "/delivery/",
+                        data: $.param(datastring),
+                        dataType: "text",
+                        success: function (data) {
+                            $('#deliveryForm').modal('hide');
+                            $('.modal-backdrop').remove();
+                            var newRow = data;
+                            $('#requestForm').find('.form-control').val('');
+                            grecaptcha.reset();
+                            successToast.push('Code successfully submitted.');
+                        },
+                        error: function (data) {
+                            console.log('Error');
+                            console.log(data);
+                        }
+                    });
+                }
+                else {
+                    console.log('Captcha not solved.');
+                }
+            });
+
+            $('.input-session-data').click(function(){
+                $('#sessionEntry').modal('show');
+            });
+
+            $('.create-session').click(function(){
+                $('#createSession').modal('show');
+            });
+
+            var userGreetingToast = new ax5.ui.toast({
+			    icon: '<i class="fa fa-user"></i>',
+			    containerPosition: "top-right"
+			});
+			userGreetingToast.push('Welcome {{ user.first_name }} {{ user.last_name }}');
+
+			var successToast = new ax5.ui.toast({
+			    icon: '<i class="fa fa-check"></i>',
+			    containerPosition: "top-right",
+			    theme:"success",
+			});
+
+			var failToast = new ax5.ui.toast({
+			    icon: '<i class="fa fa-times"></i>',
+			    containerPosition: "top-right",
+			    theme:"danger",
+			});
+
+			$(function(){
+			    $.contextMenu({
+			        selector: '.open-requests-table > tbody > .context-menu-one', 
+			        trigger: 'left',
+			        callback: function(key, options) {
+			            var m = "clicked: " + key;
+                        switch (key){
+                            case "request":
+                                var thisrow = $(this);
+                                var rowid = parseInt($(this)[0].id);
+                                console.log(rowid);
+                                $.ajax({
+                                    type: "POST",
+                                    url: "/request",
+                                    data: {
+                                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                                        requestID : rowid,
+                                        REQUEST : "REQUEST"
+                                    },
+                                    dataType: "text",
+                                    success: function (data) {
+                                        thisrow.empty();
+                                        successToast.push('Request successfully chosen.');
+                                    },
+                                    error: function (data) {
+                                        console.log('Error');
+                                        console.log(data);
+                                        failToast.push('Request failed!')
+                                    }
+                                });
+                                break;
+                        }
+
+			            console.log(m);
+			        },
+			        items: {
+			            "request": {name: "Choose Request", icon: "fa-hand-paper-o"},
+                        "message": {name: "Send Message to Requester", icon: "fa-comments-o"},
+                        "map": {name: "View on Map", icon: "fa-map-marker"},
+			            "sep1": "---------",
+			            //"quit": {name: "Quit", icon: function($element, key, item){ return 'context-menu-icon context-menu-icon-quit'; }}
+			        }
+			    });
+			});
+			
+
+            $('#chatForm').on('hidden.bs.modal', function () {
+			  	//stop setTimeout
+			  	//clearInterval(ChatChecker);
+			  	//start a new slower one for message updates
+			});
+
+			$(function(){
+			    $.contextMenu({
+			        selector: '.your-requests-table > tbody > .context-menu-one', 
+			        trigger: 'left',
+			        callback: function(key, options) {
+			            var m = "clicked: " + key;
+                        switch (key) {
+                            case "delete":
+                                var thisrow = $(this);
+                                var rowid = parseInt($(this)[0].id);
+                                console.log(rowid);
+                                $.ajax({
+                                    type: "POST",
+                                    url: "/request",
+                                    data: {
+                                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                                        requestID : rowid,
+                                        DELETE : "DELETE"
+                                    },
+                                    dataType: "text",
+                                    success: function (data) {
+                                        thisrow.empty();
+                                        successToast.push('Request successfully deleted.');
+                                    },
+                                    error: function (data) {
+                                        console.log('Error');
+                                        console.log(data);
+                                    }
+                                });
+                                break;
+
+                            case "messages":
+                                var thisrow = $(this);
+                                var rowid = parseInt($(this)[0].id);
+                                globalrequestid = rowid;
+                                initCheckMessages();
+
+                                $('#chatForm').modal('show');
+                                break;
+                        }
+			            console.log(m);
+			        },
+			        items: {
+			        	"messages": {name: "Messages", icon: "fa-envelope-o"},
+                        "map": {name: "View on Map", icon: "fa-map-marker"},
+			            //"edit": {name: "Edit", icon: "edit"}, //editable if owner's
+			            "delete": {name: "Delete Request", icon: "delete"}, //deletable if owner's
+			            "sep1": "---------",
+			            //"quit": {name: "Quit", icon: function($element, key, item){ return 'context-menu-icon context-menu-icon-quit'; }}
+			        }
+			    });
+			});
+
+
+            function getCookie(c_name)
+            {
+                if (document.cookie.length > 0)
+                {
+                    c_start = document.cookie.indexOf(c_name + "=");
+                    if (c_start != -1)
+                    {
+                        c_start = c_start + c_name.length + 1;
+                        c_end = document.cookie.indexOf(";", c_start);
+                        if (c_end == -1) c_end = document.cookie.length;
+                        return unescape(document.cookie.substring(c_start,c_end));
+                    }
+                }
+                return "";
+            }
+
+            $.ajaxSetup({
+                headers: { "X-CSRFToken": getCookie("csrftoken") }
+            });
+
+        </script>
+
+
+        <script>
+
+            var macro_micro = '';
+            var exercise_musclegrps = '';
+
+            function filtered_muscle(){
+
+                $("#exercise_list").empty();
+                $('#exercise_list').parent().find('.text').empty();
+
+                if ($('#body_muscle').val() != "ALL") {
+                    var exercises = Object.keys(exercise_musclegrps);
+                    exercises.sort();
+                    exercises.forEach(function(exercise,index){
+                        var exercise_body_parts = Object.keys(exercise_musclegrps[exercise]);
+                        var musclegrps = Object.keys(exercise_musclegrps[exercise]);
+                        musclegrps.forEach(function(muscle, ind){
+                            if (jQuery.inArray($('#body_muscle').val(), exercise_musclegrps[exercise][muscle]) !== -1){
+                                $("#exercise_list").append($("<option />").val(exercise).text(exercise));
+                            }
+                        });
+
+                    });
+                    return 0;
+                }
+
+                $("#body_muscle").empty();
+                $("#body_muscle").append($("<option />").val("ALL").text("ALL"));
+
+                if ($('#body_parts').val() != "ALL") {
+                    macro_micro[$('#body_parts').val()].forEach(function(key,index){
+                        $("#body_muscle").append($("<option />").val(key).text(key));
+                    });
+                    var exercises = Object.keys(exercise_musclegrps);
+                    exercises.sort();
+                    exercises.forEach(function(exercise,index){
+                        var exercise_body_parts = Object.keys(exercise_musclegrps[exercise]);
+                        if (jQuery.inArray($('#body_parts').val(), exercise_body_parts) !== -1){
+                            $("#exercise_list").append($("<option />").val(exercise).text(exercise));
+                        }
+                    });
+                }
+                else {
+                    var parts = Object.keys(macro_micro);
+                    parts.forEach(function(part,index) {
+                        macro_micro[part].forEach(function (key, index) {
+                            $("#body_muscle").append($("<option />").val(key).text(key));
+                        });
+                    });
+                    var exercises = Object.keys(exercise_musclegrps);
+                    exercises.sort();
+                    exercises.forEach(function(key,index){
+                        $("#exercise_list").append($("<option />").val(key).text(key));
+                    });
+                }
+
+            }
+
+             function get_musclegroups(){
+                $.ajax({
+                    type: "GET",
+                    url: "/exercise_manager/",
+                    data: {
+                        MacroMicro : "",
+                    },
+                    dataType: "json",
+                    success: function (data) {
+                        console.log(data);
+                        macro_micro = data;
+                        var body_parts = $("#body_parts");
+                        body_parts.empty();
+                        body_parts.append($("<option />").val("ALL").text("ALL"));
+                        parts = Object.keys(macro_micro);
+                        parts.sort();
+                        parts.forEach(function(key,index){
+                            body_parts.append($("<option />").val(key).text(key));
+                        });
+                        filtered_muscle();
+                    },
+                    error: function (data) {
+                        console.log('Error');
+                        console.log(data);
+                    }
+                });
+            }
+
+            function get_exercises(){
+                $.ajax({
+                    type: "GET",
+                    url: "/exercise_manager/",
+                    data: {
+                        ExerciseMuscleGroups : "",
+                    },
+                    dataType: "json",
+                    success: function (data) {
+                        exercise_musclegrps = data;
+                        get_musclegroups();
+                    },
+                    error: function (data) {
+                        console.log('Error');
+                        console.log(data);
+                    }
+                });
+            }
+            get_exercises();
+
+
+            $('#body_parts').change(function() {
+                filtered_muscle();
+            });
+
+            $('#body_muscle').change(function() {
+                filtered_muscle();
+            });
+
+
+
+
+        </script>
+
+
+	</body>
+</html>
+{% endif %}
